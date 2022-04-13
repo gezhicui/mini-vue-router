@@ -21,3 +21,7 @@ src\vue-router\install.js：插件 install 方法实现的文件
 src\vue-router\create-router-map.js：实现`match`,`addRoutes`方法的文件
 
 src\vue-router\create-matcher.js：实现用户传入的路由配置扁平化文件
+
+## 执行顺序
+
+- Vue.use 执行 install 方法，在每个实例 beforeCreate 中执行路由初始化方法（init)

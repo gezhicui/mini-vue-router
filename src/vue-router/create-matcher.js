@@ -1,4 +1,5 @@
 import createRouteMap from './create-router-map'
+import { createRoute } from './history/base'
 
 export default function createMatcher(routes) {
   //routes：用户的路由配置
@@ -11,12 +12,21 @@ export default function createMatcher(routes) {
   let { pathList, pathMap } = createRouteMap(routes)
 
   //用来匹配路由的方法
-  function match(routes) {
-
+  function match(location) {
+    //找到当前的记录
+    let record = pathMap[location];
+    let local = {
+      path: location
+    }
+    // 1.需要找到对应的记录并且要根据记录产生一个匹配数组
+    if (record) { //找到了记录
+      return createRoute((record), local)
+    }
+    return createRoute(null, local)
   }
 
   //动态添加路由的方法
-  function addRoutes(params) {
+  function addRoutes(routes) {
     createRouteMap(routes, pathList, pathMap)
   }
 
