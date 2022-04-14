@@ -20,7 +20,7 @@ export default function createMatcher(routes) {
     }
     // 1.需要找到对应的记录并且要根据记录产生一个匹配数组
     if (record) { //找到了记录
-      return createRoute((record), local)
+      return createRoute(record, local)
     }
     return createRoute(null, local)
   }

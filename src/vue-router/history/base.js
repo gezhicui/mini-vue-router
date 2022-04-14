@@ -9,9 +9,7 @@ export default class History {
 
   //跳转的核心逻辑，loaction代表跳转的目的地，complete代表跳转成功回调
   transitionTo(location, onComplete) {
-    console.log(location);
-    console.log('transitionTo', this.router.matcher);
-    // /about/a => {path: ' /about/a'，matched: [ about aboutA]}
+    //获取到的route就是当前路径要匹配哪些路由
     let route = this.router.matcher.match(location)
     console.log(route);
     onComplete && onComplete()
@@ -26,6 +24,7 @@ export function createRoute(record, location) { // path matched
       record = record.parent
     }
   }
+  console.log(res);
   return {
     ...location,
     matched: res
