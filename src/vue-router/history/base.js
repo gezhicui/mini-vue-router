@@ -11,10 +11,22 @@ export default class History {
   transitionTo(location, onComplete) {
     //获取到的route就是当前路径要匹配哪些路由
     let route = this.router.matcher.match(location)
-    console.log(route);
+    //更新current  初始化时matched会从空数组变成匹配到的组件
+    if (this.current.path === location && route.matched.length === this.current.matched.length) {
+      //如果是相同路径就不进行跳转了
+      return
+    } else {
+      this.current = route
+      this.cb && this.cb(route)
+    }
     onComplete && onComplete()
   }
+  listen(cb) {
+    this.cb = cb
+  }
 }
+
+
 
 export function createRoute(record, location) { // path matched
   let res = [];
@@ -24,7 +36,6 @@ export function createRoute(record, location) { // path matched
       record = record.parent
     }
   }
-  console.log(res);
   return {
     ...location,
     matched: res

@@ -1,6 +1,8 @@
 // import install from './install'
 import createMatcher from './create-matcher';
 import HashHistory from './history/hash'
+import RouterView from './components/view'
+import RouterLink from './components/link'
 let _Vue
 
 export default class VueRouter {
@@ -19,13 +21,31 @@ export default class VueRouter {
   init(app) { // new Vue app指 代的是根实例
 
     const history = this.history;
+    const setupHashLister = () => {
+      history.setupHashLister();
+    }
 
+    console.log(this);
     history.transitionTo(
       //跳转路径
       history.getCurrentLocation(),
       //跳转路径后要设置监听路径变化
-      history.setupHashLister
+      setupHashLister
     )
+
+    //发布订阅方法
+    history.listen((route) => {
+      app._route = route; //视图就可以刷新了
+    })
+
+  }
+
+
+  push() {
+
+  }
+  replace() {
+
   }
 }
 
@@ -43,12 +63,29 @@ VueRouter.install = function (Vue) {
 
         // init() 
         this._router.init(this);//初始化方法
-
-        Vue.util.defineReactive(this, 'route', this._router.history.current)//当前路由信息
+        //把History实例中的current变成响应式的  (目标对象，目标对象属性，目标值)
+        Vue.util.defineReactive(this, '_route', this._router.history.current)//当前路由信息
       } else {
         //找到父亲的_routerRoot 等价于this.$parent?._routerRoot
         this._routerRoot = this.$parent && this.$parent._routerRoot;
       }
     }
   });
+
+  //$route存的是属性 如path、matched
+  Object.defineProperty(Vue.prototype, '$route', {
+    get() {
+      return this._routerRoot._route
+    }
+  })
+  //$router传的都是方法
+  Object.defineProperty(Vue.prototype, '$router', {
+    get() {
+      return this._routerRoot._router;
+    }
+  })
+
+  //注册全局组件
+  Vue.component('RouterView', RouterView)
+  Vue.component('RouterLink', RouterLink)
 }
