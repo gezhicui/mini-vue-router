@@ -15,6 +15,7 @@ export default function createMatcher(routes) {
   function match(location) {
     //找到当前的记录
     let record = pathMap[location];
+    console.log('当前路由匹配的记录', record);
     let local = {
       path: location
     }

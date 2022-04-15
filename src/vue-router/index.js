@@ -60,7 +60,6 @@ VueRouter.install = function (Vue) {
         // _router是路由实例
         this._routerRoot = this;
         this._router = this.$options.router
-
         // init() 
         this._router.init(this);//初始化方法
         //把History实例中的current变成响应式的  (目标对象，目标对象属性，目标值)

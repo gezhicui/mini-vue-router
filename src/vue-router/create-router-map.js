@@ -12,7 +12,8 @@ export default function createRouteMap(routes, oldPathList, oldPathMap) {
   routes.forEach(route => {
     addRouteRecord(route, pathList, pathMap);
   });
-  console.log(pathList, pathMap);
+  console.log('pathList', pathList);
+  console.log('pathMap', pathMap);
   return {
     pathList,
     pathMap

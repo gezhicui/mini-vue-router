@@ -13,7 +13,7 @@ export default {
     let depth = 0
 
     //设当前路径是/about/a
-    //第一次肯定是渲染app的routerview,但是about里面还有个routerview，就让他往上找福清，
+    //第一次肯定是渲染app的routerview,但是about里面还有个routerview，就让他往上找父亲，
     //找到app，发现是个routerview，就depth++取marched中接下来的组件
     while (parent) {
       if (parent.$vnode && parent.$vnode.data.routerView) {
