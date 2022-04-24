@@ -1,6 +1,7 @@
 // import install from './install'
 import createMatcher from './create-matcher';
 import HashHistory from './history/hash'
+import BaseHistory from './history/base'
 import RouterView from './components/view'
 import RouterLink from './components/link'
 let _Vue
@@ -8,30 +9,54 @@ let _Vue
 export default class VueRouter {
   //router.js中 new Router传入的路由配置对象
   constructor(options) {
+    options.mode = 'base'
     //将用户传入的路由配置扁平化 matcher里包括了 match和addRoutes
     this.matcher = createMatcher(options.routes || []);
 
     //创建路由系统根据模式来创建不同的路由对象
-    this.mode = options.mode || ' hash';
-    this.history = new HashHistory(this);
+    this.mode = options.mode || 'hash';
+    if (this.mode === 'hash') {
+      this.history = new HashHistory(this);
+    } else {
+      this.history = new BaseHistory(this);
+    }
   }
 
 
   //在install的时候执行init
   init(app) { // new Vue app指 代的是根实例
-
     const history = this.history;
-    const setupHashLister = () => {
-      history.setupHashLister();
+
+    if (this.mode === 'hash') {
+      //hash路由变化处理
+      history.transitionTo(
+        //跳转路径
+        window.location.hash.slice(1),
+        //跳转路径后要设置监听路径变化
+        window.addEventListener('hashchange', () => {
+          history.transitionTo(window.location.hash.slice(1))
+        })
+      )
+    } else {
+      //history路由变化处理
+      history.transitionTo(
+        //跳转路径
+        window.location.pathname,
+        //跳转路径后要设置监听路径变化
+        () => {
+          window.addEventListener('load', () => {
+            console.log('load');
+            history.transitionTo(window.location.pathname)
+          });
+          //当浏览器前进后退的时候，要将对应的路径放到this.history中
+          window.addEventListener('popstate', () => {
+            console.log('popstate');
+            history.transitionTo(window.location.pathname)
+          });
+        }
+      )
     }
 
-    console.log(this);
-    history.transitionTo(
-      //跳转路径
-      history.getCurrentLocation(),
-      //跳转路径后要设置监听路径变化
-      setupHashLister
-    )
 
     //发布订阅方法
     history.listen((route) => {
