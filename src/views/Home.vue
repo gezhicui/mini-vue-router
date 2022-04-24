@@ -12,7 +12,7 @@ export default {
   name: 'home',
   methods: {
     toAbout() {
-      this.$router.push('/about/b')
+      this.$router.push('/about/a')
     },
     replaceAbout() {
       this.$router.replace('/about/b')

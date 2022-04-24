@@ -122,3 +122,41 @@ current={
 然后渲染 about 里面的 routerview，就让他往上找父亲，每向上一层,depth 就+1，直到找到被打标记的 router-view，depth 的值即为组件深度。就可以用 matched[depth]渲染当前 router-view 内容
 
 大功告成！！！！这里我们就实现了 Vue-router 的核心逻辑
+
+# 踩坑记录！！
+
+## popstate 无法监听 pushState 和 replaceState 事件
+
+我一直以为`pushState`和`replaceState`可以触发`popstate`事件，但是在监听`history`路由变化时，发现怎么都监听不到路由变化事件，经过各种百度之后才知道：
+
+实际的情况是 `history.pushState/replaceState` 并**不会触发 onpopstate 事件**，onpopstate **只有用户点击浏览器后退和前进按钮时，或者使用 js 调用 back、forward、go 方法时才会触发**。那么我们如何监听 history.pushState/replaceState ？
+
+答案是：**重写 + 自定义事件**
+
+重写 history.pushState/replaceState 使其在执行后触发一个自定义事件，我们通过监听这个自定义事件来接收视图变化通知，上代码：
+
+```js
+const bindEventListener = function (type) {
+  const historyEvent = history[type];
+  return function () {
+    const newEvent = historyEvent.apply(this, arguments);
+    const e = new Event(type);
+    e.arguments = arguments;
+    window.dispatchEvent(e);
+    return newEvent;
+  };
+};
+history.pushState = bindEventListener('pushState');
+history.replaceState = bindEventListener('replaceState');
+```
+
+这样就创建了 2 个全新的事件，事件名为 pushState 和 replaceState，我们就可以在全局监听：
+
+```js
+window.addEventListener('replaceState', function (e) {
+  console.log('THEY DID IT AGAIN! replaceState 111111');
+});
+window.addEventListener('pushState', function (e) {
+  console.log('THEY DID IT AGAIN! pushState 2222222');
+});
+```

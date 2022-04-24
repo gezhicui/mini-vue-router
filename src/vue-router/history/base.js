@@ -2,7 +2,6 @@
 export default class History {
   constructor(router) {//router指的就是new VueRouter实例对象
     this.router = router
-
     //默认路由中保存一个当前的路径,后续会更改这个路径
     this.current = createRoute(null, { path: '/' })
   }

@@ -5,16 +5,24 @@ export default {
       require: true
     }
   },
-  render(h) {
-    // 判断路由模式  如果是hash路由则带上#
-    const mode = this.$router.mode
-    let prefix = ''
-    if (mode === 'hash') {
-      prefix = '#'
+  methods: {
+    clickHandler(e) {
+      if (this.$router.mode === 'hash') {
+        window.location.hash = this.to
+      } else {
+        // 改变浏览器地址栏地址
+        window.history.pushState({}, '', this.to)
+      }
+      e.preventDefault();
     }
+  },
+  render(h) {
     return h('a', {
       attrs: {
-        href: prefix + this.to
+        href: this.to
+      },
+      on: {
+        click: this.clickHandler
       }
     }, this.$slots.default)
   }

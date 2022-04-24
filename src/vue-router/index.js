@@ -1,9 +1,10 @@
 // import install from './install'
 import createMatcher from './create-matcher';
 import HashHistory from './history/hash'
-import BaseHistory from './history/base'
+import HTML5History from './history/html5'
 import RouterView from './components/view'
 import RouterLink from './components/link'
+
 let _Vue
 
 export default class VueRouter {
@@ -18,7 +19,7 @@ export default class VueRouter {
     if (this.mode === 'hash') {
       this.history = new HashHistory(this);
     } else {
-      this.history = new BaseHistory(this);
+      this.history = new HTML5History(this);
     }
   }
 
@@ -26,36 +27,18 @@ export default class VueRouter {
   //在install的时候执行init
   init(app) { // new Vue app指 代的是根实例
     const history = this.history;
-
-    if (this.mode === 'hash') {
-      //hash路由变化处理
-      history.transitionTo(
-        //跳转路径
-        window.location.hash.slice(1),
-        //跳转路径后要设置监听路径变化
-        window.addEventListener('hashchange', () => {
-          history.transitionTo(window.location.hash.slice(1))
-        })
-      )
-    } else {
-      //history路由变化处理
-      history.transitionTo(
-        //跳转路径
-        window.location.pathname,
-        //跳转路径后要设置监听路径变化
-        () => {
-          window.addEventListener('load', () => {
-            console.log('load');
-            history.transitionTo(window.location.pathname)
-          });
-          //当浏览器前进后退的时候，要将对应的路径放到this.history中
-          window.addEventListener('popstate', () => {
-            console.log('popstate');
-            history.transitionTo(window.location.pathname)
-          });
-        }
-      )
+    const setupHashLister = () => {
+      //在这里单独拿出来是为了让this指向正确
+      history.setupHashLister();
     }
+
+    //hash路由变化处理
+    history.transitionTo(
+      //跳转路径
+      history.getCurrentLocation(),
+      //跳转路径后要设置监听路径变化
+      setupHashLister()
+    )
 
     //发布订阅方法
     history.listen((route) => {
@@ -67,17 +50,17 @@ export default class VueRouter {
   push(url) {
     if (this.mode === 'hash') {
       window.location.hash = url
-    } else (
-      window.location.href = url
-    )
+    } else {
+      window.history.pushState({}, '', url)
+    }
   }
 
   replace(url) {
-    let prefix = ''
     if (this.mode === 'hash') {
-      prefix = '#'
+      window.location.replace('#' + url)
+    } else {
+      window.history.replaceState({}, '', url)
     }
-    window.location.replace(prefix + url)
   }
 }
 

@@ -15,14 +15,14 @@ export default class HashHistory extends History {
     ensureSlash()
   }
 
-  // //获取当前路由hash
-  // getCurrentLocation() {
-  //   return window.location.hash.slice(1)
-  // }
-  // // 监听hashchange事件
-  // setupHashLister() {
-  //   window.addEventListener('hashchange', () => {
-  //     this.transitionTo(window.location.hash.slice(1))
-  //   })
-  // }
+  //获取当前路由hash
+  getCurrentLocation() {
+    return window.location.hash.slice(1)
+  }
+  // 监听hashchange事件
+  setupHashLister() {
+    window.addEventListener('hashchange', () => {
+      this.transitionTo(window.location.hash.slice(1))
+    })
+  }
 }
