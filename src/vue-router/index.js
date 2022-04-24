@@ -57,7 +57,6 @@ export default class VueRouter {
       )
     }
 
-
     //发布订阅方法
     history.listen((route) => {
       app._route = route; //视图就可以刷新了
@@ -65,12 +64,20 @@ export default class VueRouter {
 
   }
 
-
-  push() {
-
+  push(url) {
+    if (this.mode === 'hash') {
+      window.location.hash = url
+    } else (
+      window.location.href = url
+    )
   }
-  replace() {
 
+  replace(url) {
+    let prefix = ''
+    if (this.mode === 'hash') {
+      prefix = '#'
+    }
+    window.location.replace(prefix + url)
   }
 }
 
