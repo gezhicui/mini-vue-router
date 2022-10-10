@@ -8,34 +8,34 @@ export default function createRouteMap(routes, oldPathList, oldPathMap) {
   let pathList = oldPathList || [];
   let pathMap = oldPathMap || Object.create(null);
 
-
-  routes.forEach(route => {
+  routes.forEach((route) => {
     addRouteRecord(route, pathList, pathMap);
   });
   console.log('pathList', pathList);
   console.log('pathMap', pathMap);
   return {
     pathList,
-    pathMap
-  }
+    pathMap,
+  };
 }
 
 function addRouteRecord(route, pathList, pathMap, parent) {
   let path = parent ? `${parent.path}/${route.path}` : route.path;
 
-  let record = { //记录
+  let record = {
+    //记录
     path,
     component: route.component,
-    parent
-  }
+    parent,
+  };
   if (!pathMap[path]) {
     pathList.push(path); // 将路径添加到pathList中
     pathMap[path] = record; //将路径添加到pathMap中
   }
   if (route.children) {
-    route.children.forEach(child => {
+    route.children.forEach((child) => {
       //每次循环儿子时，都将父亲传入
-      addRouteRecord(child, pathList, pathMap, route)
-    })
+      addRouteRecord(child, pathList, pathMap, route);
+    });
   }
 }

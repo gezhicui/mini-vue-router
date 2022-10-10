@@ -4,17 +4,18 @@ export default {
   functional: true,
   render(h, context) {
     //当前router-view的父组件
-    let { parent, data } = context
-    let route = parent.$route
-    let matched = route.matched
+    let { parent, data } = context;
+    let route = parent.$route;
+    let matched = route.matched;
 
     //标识当前组件是一个router-view
-    data.routerView = true
-    let depth = 0
+    data.routerView = true;
+    let depth = 0;
 
-    //设当前路径是/about/a
-    //第一次肯定是渲染app的routerview,但是about里面还有个routerview，就让他往上找父亲，
-    //找到app，发现是个routerview，就depth++取marched中接下来的组件
+    //设当前路径是/about/a ，则有两个组件需要渲染，一个是/about的组件，一个是/a的组件,[/about组件，/a组件]
+    // 首先渲染/about，vue向上找，发现这是第一个router-view，就渲染matched[0]的组件
+    // 其次渲染/a,vue向上找，发现/about中有一个router-view，depth++,就渲染matched[1]的组件
+    // 以此类推
     while (parent) {
       if (parent.$vnode && parent.$vnode.data.routerView) {
         depth++;
@@ -22,13 +23,12 @@ export default {
       parent = parent.$parent;
     }
 
-
     let record = matched[depth];
     if (!record) {
       //不存在匹配记录 不渲染
       return h();
     }
-    let component = record.component
+    let component = record.component;
     return h(component, data);
-  }
-}
+  },
+};

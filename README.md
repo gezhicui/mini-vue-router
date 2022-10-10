@@ -110,7 +110,8 @@ transitionTo中执行内容：
 例如路径是/about/a
 current={
   path:/about/a,
-  matched:[/about组件记录,/about/a组建记录]
+  matched:[/about组件记录,/about/a组件记录]
+}
 ```
 
 - 设置 depth = 0
