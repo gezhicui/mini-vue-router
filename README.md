@@ -1,6 +1,6 @@
-# vue-router-source
+## vue-router-source
 
-## Project setup
+### Project setup
 
 ```
 yarn install
@@ -8,50 +8,45 @@ yarn install
 yarn serve
 ```
 
-# 前端路由核心原理
+## 前端路由核心原理
 
-## hash
+**hash**
 
-- #号后面的就是 hash 的内容
-- 可以通过 location.hash 拿 到
-- 可以通过 onhashchange 监听 hash 的改变
+- `#` 号后面的就是 `hash` 的内容，本质上是借用锚点
+- 可以通过 `location.hash` 拿到
+- 可以通过 `onhashchange` 监听 `hash` 的改变
 
-## history
+**history**
 
-- history 即正常路径
-- 可以通过 location.pathname 拿到
-- 可以用 onpopstate 监听 history 的变化
+- `history` 即正常路径
+- 可以通过 `location.pathname` 拿到
+- 可以用 `onpopState` 监听 `history` 的变化
 
-# 文件介绍
+<!-- more -->
 
-src\router.js 中从我定义的 vue-router 文件夹导入 vue-router
+## 目录结构(src/vue-router)
+
+`src\router.js` 中从我定义的 `vue-router文件夹`导入 `vue-router`
 
 > import Router from '@/vue-router'
 
 ```
-
-- vue-router
-
-  - components 存放link view这两个组件的实现
-    - link router-link 组件实现
-    - view router-view 组件实现
-
-  - history
-    - base history基类实现，存放路由使用中通用核心方法
-    - hash HashHistory实现，继承于base中的H5History,存放hash路由特定方法
-
-  - create-matcher.js：实现`match`,`addRoutes`方法的文件
-
-  - create-router-map.js：实现用户传入的路由配置扁平化文件
-
-  - index.js：主入口文件 包含install的实现和VueRouter类的实现
-
-
+├─vue-router (vue-router源码文件)
+│  ├─components (存放link view这两个组件的实现)
+|  │  ├─link.js (router-link 组件实现)
+|  │  ├─view.js (router-view 组件实现)
+│  ├─history (路由的核心实现)
+|  │  ├─base.js (路由基类实现，存放路由使用中通用核心方法)
+|  │  ├─hash.js (HashHistory实现，继承于base中的History,存放hash路由特定方法和监听事件)
+|  │  ├─html5.js (HTML5History实现，继承于base中的History,存放history路由特定方法和监听事件)
+│  ├─create-matcher.js (实现`match`,`addRoutes`方法的文件)
+│  ├─create-router-map.js (实现用户传入的路由配置扁平化文件)
+│  ├─index.js (主入口文件 包含install的实现和VueRouter类的实现)
 ```
 
-# Vue-Router 执行顺序
+## Vue-Router 执行顺序
 
-## router.js
+### router.js
 
 1、导入 vue-router
 
@@ -66,7 +61,7 @@ src\router.js 中从我定义的 vue-router 文件夹导入 vue-router
 
 - 根据 mode 去 new History 对象，初始化 current(当前路由),初始化核心方法
 
-## main.js
+### main.js
 
 1、 main.js 中 new Vue
 
@@ -94,11 +89,11 @@ transitionTo中执行内容：
 
 5、把\_route 设置成响应式对象，值为 current，我们之前做了监听路由改变的操作，当路由改变时重新调用 transitionTo 方法,修改 current，触发响应式操作。
 
-## 各组件中
+### 各组件中
 
 由于 router-view 的实现用到了 current，触发响应式操作时，会刷新组件。
 
-### router-view 实现原理
+#### router-view 实现原理
 
 采用函数式组件实现
 
@@ -124,17 +119,17 @@ current={
 
 大功告成！！！！这里我们就实现了 Vue-router 的核心逻辑
 
-# 踩坑记录！！
+## 踩坑记录！！
 
-## popstate 无法监听 pushState 和 replaceState 事件
+### popState 无法监听 pushState 和 replaceState 事件
 
-我一直以为`pushState`和`replaceState`可以触发`popstate`事件，但是在监听`history`路由变化时，发现怎么都监听不到路由变化事件，经过各种百度之后才知道：
+我一直以为`pushState`和`replaceState`可以触发`popState`事件，但是在监听`history`路由变化时，发现怎么都监听不到路由变化事件，经过各种百度之后才知道：
 
 实际的情况是 `history.pushState/replaceState` 并**不会触发 onpopstate 事件**，onpopstate **只有用户点击浏览器后退和前进按钮时，或者使用 js 调用 back、forward、go 方法时才会触发**。那么我们如何监听 history.pushState/replaceState ？
 
 答案是：**重写 + 自定义事件**
 
-重写 history.pushState/replaceState 使其在执行后触发一个自定义事件，我们通过监听这个自定义事件来接收视图变化通知，上代码：
+重写 `history.pushState/replaceState` 使其在执行后触发一个自定义事件，我们通过监听这个自定义事件来接收视图变化通知，上代码：
 
 ```js
 const bindEventListener = function (type) {
@@ -161,3 +156,5 @@ window.addEventListener('pushState', function (e) {
   console.log('THEY DID IT AGAIN! pushState 2222222');
 });
 ```
+
+这样，我们在调用`history.pushState/replaceState`事件时，就能触发`window`上自定义的`pushState/replaceState`事件，这个事件中存放我们自定义的处理函数，处理函数与`popState`中的处理函数操作保持一致，这样就能实现`history.pushState/replaceState`导致的`history栈`变化时，触发和`popState`相同的处理操作
